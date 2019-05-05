@@ -1,0 +1,55 @@
+#!/bin/bash
+set -e
+
+command=$1
+
+if ! [ -x "$(command -v jq)" ]; then
+        echo "Error: jq is not installed" >&2
+        exit 1
+fi
+
+if ! [ -x "$(command -v ssh)" ]; then
+        echo "Error: ssh is not installed" >&2
+        exit 1
+fi
+
+# todo: validate url has an ssh protocol
+# todo: allow specifying a remote other than origin
+git_remote_url=$(git config --get remote.origin.url)
+git_remote_host=$(sed 's/^ssh:\/\/.*@\(.*\):.*$/\1/' <<< $git_remote_url)
+git_remote_login=$(sed 's/^ssh:\/\/\(.*\)@.*$/\1/' <<< $git_remote_url)
+git_remote_port=$(sed 's/^ssh:\/\/.*:\([^/]*\)\/.*$/\1/' <<< $git_remote_url)
+
+get_changeset_ref() {
+        # either a Change-Id or Gerrit Changeset number
+        local changeset=$1
+        local changeset_info=$(ssh $git_remote_host -l $git_remote_login -p $git_remote_port gerrit query --format=JSON --current-patch-set change:$changeset | sed \$d)
+
+        # todo: validate changeset is for current project
+        local changeset_ref=$(jq -crM .currentPatchSet.ref <<< $changeset_info)
+
+        echo $changeset_ref
+}
+
+
+if [ "$command" == "checkout" ]; then
+        changeset_ref=$(get_changeset_ref $2)
+        git fetch $git_remote_url $changeset_ref && git checkout FETCH_HEAD
+
+elif [ "$command" == "cherry-pick" ]; then
+        changeset_ref=$(get_changeset_ref $2)
+        git fetch $git_remote_url $changeset_ref && git cherry-pick FETCH_HEAD
+
+elif [ "$command" == "pull" ]; then
+        change_id=$(git --no-pager log --max-count 1 HEAD | grep Change-Id | sed 's/.*: \(.*\)/\1/')
+        # todo: validate Change-Id was found
+        changeset_ref=$(get_changeset_ref $change_id)
+        git pull $git_remote_url $changeset_ref
+
+elif [ "$command" == "query" ]; then
+        ssh $git_remote_host -l $git_remote_login -p $git_remote_port gerrit query --format=JSON --current-patch-set "${@:2}" | sed \$d
+
+elif [ -z $command ]; then
+        echo "Error: must specify a command" >&2
+        exit 1
+fi
