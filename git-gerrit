@@ -28,9 +28,10 @@ git_remote_project=$(sed 's/^ssh:\/\/.*:[0-9]*\/\(.*\)$/\1/' <<< "$git_remote_ur
 get_changeset_ref() {
         # either a Change-Id or Gerrit Changeset number
         local changeset="$1"
+        local patchset="${2:latest}"
 
         local changeset_info
-        changeset_info=$(ssh "$git_remote_host" -l "$git_remote_login" -p "$git_remote_port" gerrit query --format=JSON --current-patch-set change:"$changeset" | sed \$d)
+        changeset_info=$(ssh "$git_remote_host" -l "$git_remote_login" -p "$git_remote_port" gerrit query --format=JSON --current-patch-set --patch-sets change:"$changeset" | sed \$d)
 
         local changeset_project
         changeset_project=$(jq -crM .project <<< "$changeset_info")
@@ -38,25 +39,31 @@ get_changeset_ref() {
                 echo Error: changeset is for project "$changeset_project", but local git repository is for project "$git_remote_project" >&2
                 exit 1
         fi
+
         local changeset_ref
-        changeset_ref=$(jq -crM .currentPatchSet.ref <<< "$changeset_info")
+        if [[ "$patchset" == "latest" ]]; then
+                changeset_ref=$(jq -crM .currentPatchSet.ref <<< "$changeset_info")
+        else
+                # todo: validate patchset number found
+                changeset_ref=$(jq -crM ".patchSets[] | select(.number == \"$patchset\") | .ref" <<< "$changeset_info")
+        fi
 
         echo "$changeset_ref"
 }
 
 
 if [ "$command" == "checkout" ]; then
-        changeset_ref=$(get_changeset_ref "$2")
+        changeset_ref=$(get_changeset_ref "$2" "$3")
         git fetch "$git_remote_url" "$changeset_ref" && git checkout FETCH_HEAD
 
 elif [ "$command" == "cherry-pick" ]; then
-        changeset_ref=$(get_changeset_ref "$2")
+        changeset_ref=$(get_changeset_ref "$2" "$3")
         git fetch "$git_remote_url" "$changeset_ref" && git cherry-pick FETCH_HEAD
 
 elif [ "$command" == "pull" ]; then
         change_id=$(git --no-pager log --max-count 1 HEAD | grep Change-Id | sed 's/.*: \(.*\)/\1/')
         # todo: validate Change-Id was found
-        changeset_ref=$(get_changeset_ref "$change_id")
+        changeset_ref=$(get_changeset_ref "$change_id" "$2")
         git pull "$git_remote_url" "$changeset_ref"
 
 elif [ "$command" == "query" ]; then

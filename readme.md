@@ -14,14 +14,17 @@ The available commands expect to be ran in a Git repository whose `origin` remot
 
 ## Available commands
 
-- `git gerrit checkout CHANGE`
+- `git gerrit checkout CHANGE OPTIONAL_PATCHSET`
   - Checks out the latest patchset revision for a given Change-Id or Changeset Number
+  - If OPTIONAL_PATCHSET is provided then that patchset is checked out instead of the latest
 
-- `git gerrit cherry-pick CHANGE`
+- `git gerrit cherry-pick CHANGE OPTIONAL_PATCHSET`
   - Cherry-picks the latest patchset revision for a given Change-Id or Changeset Number
+  - If OPTIONAL_PATCHSET is provided then that patchset is cherry-picked instead of the latest
 
-- `git gerrit pull`
+- `git gerrit pull OPTIONAL_PATCHSET`
   - Looks at the `HEAD` commit to find Change-Id and pulls the latest patchset revision for the found Change-Id
+  - If OPTIONAL_PATCHSET is provided then that patchset is pulled instead of the latest
 
 - `git gerrit query ...`
   - Used to run arbitrary gerrit queries, mostly used for debugging.
