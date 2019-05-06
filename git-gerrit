@@ -13,9 +13,13 @@ if ! [ -x "$(command -v ssh)" ]; then
         exit 1
 fi
 
-# todo: validate url has an ssh protocol
 # todo: allow specifying a remote other than origin
 git_remote_url=$(git config --get remote.origin.url)
+if ! [[ "$git_remote_url" =~ ^ssh://.*@.*:[0-9]*/.*$ ]]; then
+        echo "Error: expected \`remote.origin.url\` to follow format of \`ssh://username@host:port/repository/location\`"
+        exit 1
+fi
+
 git_remote_host=$(sed 's/^ssh:\/\/.*@\(.*\):.*$/\1/' <<< "$git_remote_url")
 git_remote_login=$(sed 's/^ssh:\/\/\(.*\)@.*$/\1/' <<< "$git_remote_url")
 git_remote_port=$(sed 's/^ssh:\/\/.*:\([^/]*\)\/.*$/\1/' <<< "$git_remote_url")
