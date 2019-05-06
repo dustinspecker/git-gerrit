@@ -23,6 +23,7 @@ fi
 git_remote_host=$(sed 's/^ssh:\/\/.*@\(.*\):.*$/\1/' <<< "$git_remote_url")
 git_remote_login=$(sed 's/^ssh:\/\/\(.*\)@.*$/\1/' <<< "$git_remote_url")
 git_remote_port=$(sed 's/^ssh:\/\/.*:\([^/]*\)\/.*$/\1/' <<< "$git_remote_url")
+git_remote_project=$(sed 's/^ssh:\/\/.*:[0-9]*\/\(.*\)$/\1/' <<< "$git_remote_url")
 
 get_changeset_ref() {
         # either a Change-Id or Gerrit Changeset number
@@ -31,7 +32,12 @@ get_changeset_ref() {
         local changeset_info
         changeset_info=$(ssh "$git_remote_host" -l "$git_remote_login" -p "$git_remote_port" gerrit query --format=JSON --current-patch-set change:"$changeset" | sed \$d)
 
-        # todo: validate changeset is for current project
+        local changeset_project
+        changeset_project=$(jq -crM .project <<< "$changeset_info")
+        if [[ "$changeset_project" != "$git_remote_project" ]]; then
+                echo Error: changeset is for project "$changeset_project", but local git repository is for project "$git_remote_project" >&2
+                exit 1
+        fi
         local changeset_ref
         changeset_ref=$(jq -crM .currentPatchSet.ref <<< "$changeset_info")
 
