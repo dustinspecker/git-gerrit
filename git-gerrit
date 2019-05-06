@@ -60,6 +60,10 @@ elif [ "$command" == "cherry-pick" ]; then
         changeset_ref=$(get_changeset_ref "$2" "$3")
         git fetch "$git_remote_url" "$changeset_ref" && git cherry-pick FETCH_HEAD
 
+elif [ "$command" == "fetch" ]; then
+        changeset_ref=$(get_changeset_ref "$2" "$3")
+        git fetch "$git_remote_url" "$changeset_ref"
+
 elif [ "$command" == "pull" ]; then
         change_id=$(git --no-pager log --max-count 1 HEAD | grep Change-Id | sed 's/.*: \(.*\)/\1/')
         # todo: validate Change-Id was found

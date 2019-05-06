@@ -22,6 +22,12 @@ The available commands expect to be ran in a Git repository whose `origin` remot
   - Cherry-picks the latest patchset revision for a given Change-Id or Changeset Number
   - If OPTIONAL_PATCHSET is provided then that patchset is cherry-picked instead of the latest
 
+- `git gerrit fetch CHANGE OPTIONAL_PATCHSET`
+  - Fetch the latest patchset revision for a given Change-Id or Changeset Number
+  - If OPTIONAL_PATCHSET is provided then that patchset is fetched instead of the latest
+  - Useful for getting a reference to FETCH_HEAD set
+    - `git gerrit fetch CHANGE OPTIONAL_PATCHSET && git rebase --onto FETCH_HEAD HEAD^ master`
+
 - `git gerrit pull OPTIONAL_PATCHSET`
   - Looks at the `HEAD` commit to find Change-Id and pulls the latest patchset revision for the found Change-Id
   - If OPTIONAL_PATCHSET is provided then that patchset is pulled instead of the latest
