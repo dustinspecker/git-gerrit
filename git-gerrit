@@ -16,7 +16,7 @@ fi
 # todo: allow specifying a remote other than origin
 git_remote_url=$(git config --get remote.origin.url)
 if ! [[ "$git_remote_url" =~ ^ssh://.*@.*:[0-9]*/.*$ ]]; then
-        echo "Error: expected \`remote.origin.url\` to follow format of \`ssh://username@host:port/repository/location\`"
+        echo "Error: expected \`remote.origin.url\` to follow format of \`ssh://username@host:port/repository/location\`" >&2
         exit 1
 fi
 
