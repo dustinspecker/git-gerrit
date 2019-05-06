@@ -28,7 +28,7 @@ git_remote_project=$(sed 's/^ssh:\/\/.*:[0-9]*\/\(.*\)$/\1/' <<< "$git_remote_ur
 get_changeset_ref() {
         # either a Change-Id or Gerrit Changeset number
         local changeset="$1"
-        local patchset="${2:latest}"
+        local patchset="${2:-latest}"
 
         local changeset_info
         changeset_info=$(ssh "$git_remote_host" -l "$git_remote_login" -p "$git_remote_port" gerrit query --format=JSON --current-patch-set --patch-sets change:"$changeset" | sed \$d)
