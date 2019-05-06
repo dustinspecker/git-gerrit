@@ -1,0 +1,8 @@
+language: shell
+sudo: false
+install:
+  - wget -qO- "https://storage.googleapis.com/shellcheck/shellcheck-stable.linux.x86_64.tar.xz" | tar -xJv
+before_script:
+  - shellcheck-stable/shellcheck --version
+script:
+  - shellcheck-stable/shellcheck git-gerrit
