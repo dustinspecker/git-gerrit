@@ -64,6 +64,32 @@ elif [ "$command" == "fetch" ]; then
         changeset_ref=$(get_changeset_ref "$2" "$3")
         git fetch "$git_remote_url" "$changeset_ref"
 
+elif [ "$command" == "link" ]; then
+        # either a Change-Id or Commit SHA
+        change_id_or_commit_sha="$2"
+
+        if [[ $change_id_or_commit_sha =~ ^I.*$ ]]; then
+                is_change_id=true
+        else
+                is_change_id=false
+        fi
+
+        if [[ $is_change_id = true ]]; then
+                query="change:$change_id_or_commit_sha"
+        else
+                query="commit:$change_id_or_commit_sha"
+        fi
+
+        changeset_info=$(ssh "$git_remote_host" -l "$git_remote_login" -p "$git_remote_port" gerrit query --format=JSON --patch-sets "$query" | sed \$d)
+
+        url=$(jq -crM .url <<< "$changeset_info")
+        if [[ $is_change_id = true ]]; then
+                echo "$url"
+        else
+                ref=$(jq -crM ".patchSets[] | select(.revision == \"$change_id_or_commit_sha\") | .number" <<< "$changeset_info")
+                echo "$url"/"$ref"
+        fi
+
 elif [ "$command" == "pull" ]; then
         change_id=$(git --no-pager log --max-count 1 HEAD | grep Change-Id | sed 's/.*: \(.*\)/\1/')
         # todo: validate Change-Id was found
