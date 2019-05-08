@@ -1,6 +1,8 @@
 # git-gerrit
 > Git commands Dustin uses with Gerrit
 
+[![Build Status](https://travis-ci.org/dustinspecker/git-gerrit.svg?branch=master)](https://travis-ci.org/dustinspecker/git-gerrit)
+
 ## Install
 
 1. `ssh` and `jq` must both be installed to use `git gerrit`
