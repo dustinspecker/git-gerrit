@@ -102,4 +102,8 @@ elif [ "$command" == "query" ]; then
 elif [ -z "$command" ]; then
         echo "Error: must specify a command" >&2
         exit 1
+
+else
+        echo "Error: $command not found" >&2
+        exit 1
 fi
