@@ -44,8 +44,12 @@ get_changeset_ref() {
         if [[ "$patchset" == "latest" ]]; then
                 changeset_ref=$(jq -crM .currentPatchSet.ref <<< "$changeset_info")
         else
-                # todo: validate patchset number found
                 changeset_ref=$(jq -crM ".patchSets | map(. + {\"number\": .number | tonumber}) | .[] | select(.number == $patchset) | .ref" <<< "$changeset_info")
+
+                if [[ -z "$changeset_ref" ]]; then
+                        echo "Error: patchset $patchset not found for changeset $changeset" >&2
+                        exit 1
+                fi
         fi
 
         echo "$changeset_ref"
