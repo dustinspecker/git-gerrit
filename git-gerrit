@@ -96,7 +96,12 @@ elif [ "$command" == "link" ]; then
 
 elif [ "$command" == "pull" ]; then
         change_id=$(git --no-pager log --max-count 1 HEAD | grep Change-Id | sed 's/.*: \(.*\)/\1/')
-        # todo: validate Change-Id was found
+
+        if [[ -z "$change_id" ]]; then
+                echo "Error: Change-Id not found in HEAD commit" >&2
+                exit 1
+        fi
+
         changeset_ref=$(get_changeset_ref "$change_id" "$2")
         git pull "$git_remote_url" "$changeset_ref"
 
