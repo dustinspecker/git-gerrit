@@ -41,6 +41,13 @@ The available commands expect to be ran in a Git repository whose `origin` remot
 - `git gerrit query ...`
   - Used to run arbitrary gerrit queries, mostly used for debugging.
 
+## Development
+
+### Install required dependencies
+
+1. `make` and [shellcheck](https://github.com/koalaman/shellcheck#user-content-installing) must be installed
+   - `git-gerrit` is using the latest stable version of `shellcheck`
+2. Run `make test` to verify linting passes
 
 ## License
 
