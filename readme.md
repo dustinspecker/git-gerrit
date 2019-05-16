@@ -5,7 +5,7 @@
 
 ## Install
 
-1. `ssh` and `jq` must both be installed to use `git gerrit`
+1. `ssh` and [jq](https://stedolan.github.io/jq/) must both be installed to use `git gerrit`
 1. Clone this respository via `git clone https://github.com/dustinspecker/git-gerrit ~/git-gerrit`
 1. Add `git-gerrit` to `PATH` via `export PATH=$PATH:~/git-gerrit`
 1. The commands listed below are now available
