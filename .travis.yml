@@ -5,4 +5,4 @@ install:
 before_script:
   - shellcheck-stable/shellcheck --version
 script:
-  - shellcheck-stable/shellcheck git-gerrit
+  - make SHELLCHECK_EXECUTABLE=shellcheck-stable/shellcheck test
