@@ -62,7 +62,7 @@ if [ "$command" == "checkout" ]; then
 
 elif [ "$command" == "cherry-pick" ]; then
         changeset_ref=$(get_changeset_ref "$2" "$3")
-        git fetch "$git_remote_url" "$changeset_ref" && git cherry-pick FETCH_HEAD
+        git fetch "$git_remote_url" "$changeset_ref" && git cherry-pick -x FETCH_HEAD
 
 elif [ "$command" == "fetch" ]; then
         changeset_ref=$(get_changeset_ref "$2" "$3")
