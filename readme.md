@@ -41,6 +41,10 @@ The available commands expect to be ran in a Git repository whose `origin` remot
 - `git gerrit query ...`
   - Used to run arbitrary gerrit queries, mostly used for debugging.
 
+- `git gerrit revert CHANGE OPTIONAL_PATCHSET`
+  - Revets the latest patchset revision for a given Change-Id or Changeset Number
+  - If OPTIONAL_PATCHSET is provided then that patchset is reverted instead of the latest
+
 ## Development
 
 ### Install required dependencies

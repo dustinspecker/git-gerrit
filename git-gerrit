@@ -108,6 +108,10 @@ elif [ "$command" == "pull" ]; then
 elif [ "$command" == "query" ]; then
         ssh "$git_remote_host" -l "$git_remote_login" -p "$git_remote_port" gerrit query --format=JSON --current-patch-set "${@:2}" | sed \$d
 
+elif [ "$command" == "revert" ]; then
+        changeset_ref=$(get_changeset_ref "$2" "$3")
+        git fetch "$git_remote_url" "$changeset_ref" && git revert FETCH_HEAD
+
 elif [ -z "$command" ]; then
         echo "Error: must specify a command" >&2
         exit 1
